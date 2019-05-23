@@ -20,6 +20,13 @@ const common = {
     },
     module: {
         rules: [{
+            exclude: new RegExp(`node_modules(?!(\/|\\\\)(@sourcegraph(\/|\\\\)vscode-ws-jsonrpc|strict-uri-encode|vscode-jsonrpc|vscode-languageserver-protocol))`),
+            loader: "babel-loader",
+            options: {
+                presets: ["@babel/preset-env"],
+            },
+            test: /\.js$/,
+        }, {
             test: /\.css$/,
             use: ['style-loader', 'css-loader']
         }]

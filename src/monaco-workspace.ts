@@ -91,7 +91,7 @@ export class MonacoWorkspace implements Workspace {
         const models: {[uri: string]: monaco.editor.IModel} = edit.edits.reduce(
             (acc: {[uri: string]: monaco.editor.IModel}, currentEdit) => {
                 const textEdit = currentEdit as monaco.languages.ResourceTextEdit;
-                acc[textEdit.resource.toString()] = monaco.editor.getModel(textEdit.resource);
+                acc[textEdit.resource.toString()] = monaco.editor.getModel(textEdit.resource)!;
                 return acc;
             }, {}
         );

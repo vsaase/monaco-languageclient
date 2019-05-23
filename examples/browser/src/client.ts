@@ -31,7 +31,7 @@ monaco.editor.create(document.getElementById("container")!, {
 });
 
 function getModel(): monaco.editor.IModel {
-    return monaco.editor.getModel(MONACO_URI);
+    return monaco.editor.getModel(MONACO_URI)!;
 }
 
 function createDocument(model: monaco.editor.IReadOnlyModel) {
@@ -57,7 +57,7 @@ const jsonService = getLanguageService({
 const pendingValidationRequests = new Map<string, number>();
 
 monaco.languages.registerCompletionItemProvider(LANGUAGE_ID, {
-    provideCompletionItems(model, position, token): monaco.languages.CompletionItem[] | Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | Thenable<monaco.languages.CompletionList> {
+    provideCompletionItems(model, position, context, token): PromiseLike<monaco.languages.CompletionList> {
         const document = createDocument(model);
         const jsonDocument = jsonService.parseJSONDocument(document);
         return jsonService.doComplete(document, m2p.asPosition(position.lineNumber, position.column), jsonDocument).then((list) => {
@@ -65,13 +65,13 @@ monaco.languages.registerCompletionItemProvider(LANGUAGE_ID, {
         });
     },
 
-    resolveCompletionItem(item, token): monaco.languages.CompletionItem | Thenable<monaco.languages.CompletionItem> {
+    resolveCompletionItem(model, position, item, token): PromiseLike<monaco.languages.CompletionItem> {
         return jsonService.doResolve(m2p.asCompletionItem(item)).then(result => p2m.asCompletionItem(result));
     }
 });
 
 monaco.languages.registerDocumentRangeFormattingEditProvider(LANGUAGE_ID, {
-    provideDocumentRangeFormattingEdits(model, range, options, token): monaco.languages.TextEdit[] | Thenable<monaco.languages.TextEdit[]> {
+    provideDocumentRangeFormattingEdits(model, range, options, token): monaco.languages.TextEdit[] {
         const document = createDocument(model);
         const edits = jsonService.format(document, m2p.asRange(range), m2p.asFormattingOptions(options));
         return p2m.asTextEdits(edits);
@@ -79,7 +79,7 @@ monaco.languages.registerDocumentRangeFormattingEditProvider(LANGUAGE_ID, {
 });
 
 monaco.languages.registerDocumentSymbolProvider(LANGUAGE_ID, {
-    provideDocumentSymbols(model, token): monaco.languages.DocumentSymbol[] | Thenable<monaco.languages.DocumentSymbol[]> {
+    provideDocumentSymbols(model, token): monaco.languages.DocumentSymbol[] {
         const document = createDocument(model);
         const jsonDocument = jsonService.parseJSONDocument(document);
         return p2m.asSymbolInformations(jsonService.findDocumentSymbols(document, jsonDocument));
@@ -87,7 +87,7 @@ monaco.languages.registerDocumentSymbolProvider(LANGUAGE_ID, {
 });
 
 monaco.languages.registerHoverProvider(LANGUAGE_ID, {
-    provideHover(model, position, token): monaco.languages.Hover | Thenable<monaco.languages.Hover> {
+    provideHover(model, position, token): PromiseLike<monaco.languages.Hover> {
         const document = createDocument(model);
         const jsonDocument = jsonService.parseJSONDocument(document);
         return jsonService.doHover(document, m2p.asPosition(position.lineNumber, position.column), jsonDocument).then((hover) => {
@@ -130,5 +130,5 @@ function doValidate(document: TextDocument): void {
 }
 
 function cleanDiagnostics(): void {
-    monaco.editor.setModelMarkers(monaco.editor.getModel(MONACO_URI), 'default', []);
+    monaco.editor.setModelMarkers(getModel(), 'default', []);
 }

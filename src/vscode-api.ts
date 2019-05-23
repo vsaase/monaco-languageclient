@@ -8,7 +8,7 @@ import URI from "vscode-uri"
 import { Disposable } from "./disposable";
 import {
     Services, Event, Diagnostic, WorkspaceEdit, isDocumentSelector,
-    MessageActionItem, MessageType, OutputChannel, CompletionTriggerKind, DocumentIdentifier
+    MessageType, CompletionTriggerKind, DocumentIdentifier
 } from "./services";
 
 export function createVSCodeApi(servicesProvider: Services.Provider): typeof vscode {
@@ -502,7 +502,7 @@ export function createVSCodeApi(servicesProvider: Services.Provider): typeof vsc
         setLanguageConfiguration: unsupported,
         onDidChangeDiagnostics: unsupported
     };
-    function showMessage(type: MessageType, arg0: any, arg1: any): Thenable<undefined | MessageActionItem> {
+    function showMessage(type: MessageType, arg0: any, ...arg1: any[]): Thenable<string | undefined> {
         if (typeof arg0 !== "string") {
             throw new Error('unexpected message: ' + JSON.stringify(arg0));
         }
@@ -523,8 +523,7 @@ export function createVSCodeApi(servicesProvider: Services.Provider): typeof vsc
         showErrorMessage: showMessage.bind(undefined, MessageType.Error),
         createOutputChannel(name: string): vscode.OutputChannel {
             const { window } = servicesProvider();
-            const createOutputChannel = window ? window.createOutputChannel : undefined;
-            const channel: OutputChannel = createOutputChannel ? createOutputChannel.bind(window)(name) : undefined;
+            const channel = window!.createOutputChannel!.bind(window)(name);
             return {
                 name,
                 append: channel.append.bind(channel),
