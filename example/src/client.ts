@@ -7,7 +7,6 @@ import {
     MonacoLanguageClient, CloseAction, ErrorAction,
     MonacoServices, createConnection
 } from 'monaco-languageclient';
-import normalizeUrl = require('normalize-url');
 const ReconnectingWebSocket = require('reconnecting-websocket');
 
 // register Monaco languages
@@ -35,7 +34,7 @@ const editor = monaco.editor.create(document.getElementById("container")!, {
 MonacoServices.install(editor);
 
 // create the web socket
-const url = createUrl('/sampleServer')
+const url = "ws://localhost:5001/radls"
 const webSocket = createWebSocket(url);
 // listen when the web socket is opened
 listen({
@@ -69,10 +68,6 @@ function createLanguageClient(connection: MessageConnection): MonacoLanguageClie
     });
 }
 
-function createUrl(path: string): string {
-    const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-    return normalizeUrl(`${protocol}://${location.host}${location.pathname}${path}`);
-}
 
 function createWebSocket(url: string): WebSocket {
     const socketOptions = {
