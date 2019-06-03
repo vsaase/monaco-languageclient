@@ -81,14 +81,17 @@ export class MonacoLanguages implements Languages {
     protected createCompletionProvider(selector: DocumentSelector, provider: CompletionItemProvider, ...triggerCharacters: string[]): monaco.languages.CompletionItemProvider {
         return {
             triggerCharacters,
-            provideCompletionItems: (model, position, token, context) => {
+            provideCompletionItems: (model, position, context, token) => {
                 if (!this.matchModel(selector, MonacoModelIdentifier.fromModel(model))) {
-                    return [];
+                    return {
+                        incomplete: false,
+                        suggestions: [],
+                    }
                 }
                 const params = this.m2p.asCompletionParams(model, position, context);
                 return provider.provideCompletionItems(params, token).then(result => this.p2m.asCompletionResult(result));
             },
-            resolveCompletionItem: provider.resolveCompletionItem ? (item, token) => {
+            resolveCompletionItem: provider.resolveCompletionItem ? (model, position, item, token) => {
                 const protocolItem = this.m2p.asCompletionItem(item);
                 return provider.resolveCompletionItem!(protocolItem, token).then(resolvedItem => {
                     const resolvedCompletionItem = this.p2m.asCompletionItem(resolvedItem);
@@ -408,7 +411,9 @@ export class MonacoLanguages implements Languages {
                     return undefined!;
                 }
                 const params = this.m2p.asDocumentLinkParams(model);
-                return provider.provideDocumentLinks(params, token).then(result => this.p2m.asDocumentLinks(result));
+                return provider.provideDocumentLinks(params, token).then(result => ({
+                    links: this.p2m.asDocumentLinks(result)
+                }));
             },
 
             resolveLink: (link: monaco.languages.ILink, token) => {

@@ -82,7 +82,7 @@ export class MonacoModelDiagnostics implements Disposable {
         this.doUpdateModelMarkers(model);
     }
 
-    protected doUpdateModelMarkers(model: IModel | undefined): void {
+    protected doUpdateModelMarkers(model: IModel | null): void {
         if (model && this.uri.toString() === model.uri.toString()) {
             monaco.editor.setModelMarkers(model, this.owner, this._markers);
         }

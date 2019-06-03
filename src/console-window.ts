@@ -6,7 +6,7 @@ import { MessageActionItem, MessageType, Window, OutputChannel } from './service
 
 export class ConsoleWindow implements Window {
     protected readonly channels = new Map<string, OutputChannel>();
-    showMessage<T extends MessageActionItem>(type: MessageType, message: string, ...actions: T[]): Thenable<T | undefined> {
+    showMessage<T extends MessageActionItem>(type: MessageType, message: string, ...actions: T[]): Thenable<string | undefined> {
         if (type === MessageType.Error) {
             console.error(message);
         }
