@@ -5,7 +5,7 @@
 /// <reference types='monaco-editor-core/monaco'/>
 
 declare module monaco.editor {
-    export interface IStandaloneCodeEditor {
+    export interface IEditor {
         readonly _commandService: monaco.services.StandaloneCommandService;
     }
 }

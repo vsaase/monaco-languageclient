@@ -20,7 +20,7 @@ export namespace MonacoServices {
         rootUri?: string
     }
     export type Provider = () => MonacoServices;
-    export function create(editor: monaco.editor.IStandaloneCodeEditor, options: Options = {}): MonacoServices {
+    export function create(editor: monaco.editor.IEditor, options: Options = {}): MonacoServices {
         const m2p = new MonacoToProtocolConverter();
         const p2m = new ProtocolToMonacoConverter();
         return {
@@ -30,7 +30,7 @@ export namespace MonacoServices {
             window: new ConsoleWindow()
         }
     }
-    export function install(editor: monaco.editor.IStandaloneCodeEditor, options: Options = {}): MonacoServices {
+    export function install(editor: monaco.editor.IEditor, options: Options = {}): MonacoServices {
         const services = create(editor, options);
         Services.install(services);
         return services;
